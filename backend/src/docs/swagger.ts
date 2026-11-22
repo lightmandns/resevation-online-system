@@ -21,11 +21,10 @@ const doc = {
       type: 'object',
       required: ['fullName', 'email', 'password'],
       properties: {
-        fullName: { type: 'string', example: 'Developer Mazaya' },
-        email: { type: 'string', example: 'developer@mazaya.dev' },
+        fullName: { type: 'string', example: 'Pelanggan Mazaya' },
+        email: { type: 'string', example: 'customer@mazaya.dev' },
         phoneNumber: { type: 'string', example: '085952403117' },
-        password: { type: 'string', example: 'Mazaya2026!' },
-        role: { type: 'string', example: 'Customer' },
+        password: { type: 'string', example: 'Password123!' },
       },
     },
     LoginInput: {

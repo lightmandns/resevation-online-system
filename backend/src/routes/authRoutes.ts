@@ -1,16 +1,26 @@
 import { Router } from 'express';
-import { register, login, logout, getProfile, updateProfile } from '../controllers/authController.js';
-import { verifyToken } from '../middleware/authMiddleware.js';
+import {
+  register,
+  login,
+  logout,
+  forgotPassword,
+  resetPassword,
+  getProfile,
+  updateProfile,
+} from '../controllers/authController.js';
+import { authenticateJwt } from '../middleware/v1AuthMiddleware.js';
 
 const router = Router();
 
-// Public routes
+// Public auth routes (E01, E02, E04, E05)
 router.post('/register', register);
 router.post('/login', login);
-router.post('/logout', logout);
+router.post('/password/forgot', forgotPassword);
+router.post('/password/reset', resetPassword);
 
-// Protected routes
-router.get('/me', verifyToken, getProfile);
-router.put('/profile', verifyToken, updateProfile);
+// Protected auth routes (E03 + profil sendiri)
+router.post('/logout', authenticateJwt, logout);
+router.get('/me', authenticateJwt, getProfile);
+router.put('/profile', authenticateJwt, updateProfile);
 
 export default router;

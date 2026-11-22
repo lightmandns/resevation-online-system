@@ -1,263 +1,116 @@
 import { Request, Response } from 'express';
-import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
-import { userRepository } from '../repositories/userRepository.js';
-import { AuthRequest } from '../types/index.js';
+import { V1AuthRequest } from '../middleware/v1AuthMiddleware.js';
+import { authService } from '../services/authService.js';
+import { sendSuccess, sendError } from '../utils/apiResponse.js';
+import { getClientIp, ServiceError } from '../utils/errors.js';
 
-const generateToken = (user: { userId: number; email: string; fullName: string; role: string }) => {
-  return jwt.sign(
-    {
-      userId: user.userId,
-      email: user.email,
-      fullName: user.fullName,
-      role: user.role,
-    },
-    process.env.JWT_SECRET || 'default_secret_key',
-    {
-      expiresIn: process.env.JWT_EXPIRES_IN || '1d',
-    } as jwt.SignOptions
-  );
+const handleError = (res: Response, tag: string, error: unknown): void => {
+  if (error instanceof ServiceError) {
+    sendError(res, error.statusCode, error.message, [
+      { code: error.code, ...(error.field ? { field: error.field } : {}) },
+    ]);
+    return;
+  }
+
+  console.error(`[${tag} Error]`, error);
+  sendError(res, 503, 'Layanan sedang mengalami gangguan. Silakan coba kembali.', [
+    { code: 'ERR-SYS-01' },
+  ]);
 };
 
 export const register = async (req: Request, res: Response): Promise<void> => {
+  // #swagger.tags = ['Auth (E01-E05)']
+  // #swagger.summary = 'E01: Registrasi pelanggan baru (role otomatis Customer, bcrypt cost 12)'
   try {
-    const { fullName, email, phoneNumber, password, role } = req.body;
-
-    if (!fullName || !email || !password) {
-      res.status(400).json({
-        success: false,
-        message: 'Nama lengkap (fullName), email, dan password wajib diisi.',
-      });
-      return;
-    }
-
-    if (password.length < 6) {
-      res.status(400).json({
-        success: false,
-        message: 'Password minimal harus 6 karakter.',
-      });
-      return;
-    }
-
-    // Menggunakan Drizzle ORM Repository
-    const existingUser = await userRepository.findByEmail(email);
-    if (existingUser) {
-      res.status(409).json({
-        success: false,
-        message: 'Email sudah terdaftar. Silakan gunakan email lain atau login.',
-      });
-      return;
-    }
-
-    const salt = await bcrypt.genSalt(10);
-    const passwordHash = await bcrypt.hash(password, salt);
-    const assignedRole = role || 'Customer';
-
-    const newUser = await userRepository.create({
-      fullName: fullName.trim(),
-      email: email.trim().toLowerCase(),
-      phoneNumber: phoneNumber ? phoneNumber.trim() : null,
-      passwordHash,
-      role: assignedRole,
-      isActive: true,
-    });
-
-    if (!newUser) {
-      res.status(500).json({
-        success: false,
-        message: 'Gagal membuat user baru.',
-      });
-      return;
-    }
-
-    const token = generateToken(newUser);
-
-    res.status(201).json({
-      success: true,
-      message: 'Registrasi berhasil!',
-      data: {
-        user: newUser,
-        token,
-      },
-    });
-  } catch (error: any) {
-    console.error('Error saat registrasi (Drizzle):', error);
-    res.status(500).json({
-      success: false,
-      message: 'Terjadi kesalahan pada server saat registrasi: ' + error.message,
-    });
+    const data = await authService.register(req.body ?? {});
+    sendSuccess(res, data, 'Registrasi berhasil', 201);
+  } catch (error) {
+    handleError(res, 'E01 register', error);
   }
 };
 
 export const login = async (req: Request, res: Response): Promise<void> => {
+  // #swagger.tags = ['Auth (E01-E05)']
+  // #swagger.summary = 'E02: Login semua role (JWT 24 jam / 30 hari Ingat Saya, lockout 3x gagal)'
   try {
-    const { email, password } = req.body;
-
-    if (!email || !password) {
-      res.status(400).json({
-        success: false,
-        message: 'Email dan password wajib diisi.',
-      });
-      return;
-    }
-
-    // Menggunakan Drizzle ORM Repository
-    const user = await userRepository.findByEmail(email);
-    if (!user) {
-      res.status(401).json({
-        success: false,
-        message: 'Email atau password salah.',
-      });
-      return;
-    }
-
-    if (!user.isActive) {
-      res.status(403).json({
-        success: false,
-        message: 'Akun Anda dinonaktifkan. Silakan hubungi administrator.',
-      });
-      return;
-    }
-
-    const isMatch = await bcrypt.compare(password, user.passwordHash);
-    if (!isMatch) {
-      res.status(401).json({
-        success: false,
-        message: 'Email atau password salah.',
-      });
-      return;
-    }
-
-    // Update LastLogin dengan Drizzle
-    await userRepository.updateLastLogin(user.userId);
-
-    const token = generateToken(user);
-    const { passwordHash: _, ...userData } = user;
-
-    res.json({
-      success: true,
-      message: 'Login berhasil!',
-      data: {
-        user: userData,
-        token,
-      },
-    });
-  } catch (error: any) {
-    console.error('Error saat login (Drizzle):', error);
-    res.status(500).json({
-      success: false,
-      message: 'Terjadi kesalahan pada server saat login: ' + error.message,
-    });
+    const data = await authService.login(req.body ?? {}, getClientIp(req));
+    sendSuccess(res, data, 'Login berhasil');
+  } catch (error) {
+    handleError(res, 'E02 login', error);
   }
 };
 
-export const logout = async (req: Request, res: Response): Promise<void> => {
+export const logout = async (req: V1AuthRequest, res: Response): Promise<void> => {
+  // #swagger.tags = ['Auth (E01-E05)']
+  // #swagger.summary = 'E03: Logout (blacklist token JWT & catat audit log)'
   try {
-    res.json({
-      success: true,
-      message: 'Logout berhasil. Sesi telah diakhiri.',
+    const token = (req.headers.authorization || '').slice(7).trim();
+    if (!req.v1User || !token) {
+      sendError(res, 401, 'Silakan login untuk melanjutkan.', [{ code: 'ERR-AUTH-01' }]);
+      return;
+    }
+
+    await authService.logout(token, {
+      userId: req.v1User.user_id,
+      userEmail: req.v1User.email,
+      ipAddress: getClientIp(req),
+      exp: req.v1User.exp,
     });
-  } catch (error: any) {
-    console.error('Error logout:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Gagal melakukan logout: ' + error.message,
-    });
+
+    sendSuccess(res, {}, 'Berhasil keluar');
+  } catch (error) {
+    handleError(res, 'E03 logout', error);
   }
 };
 
-export const getProfile = async (req: AuthRequest, res: Response): Promise<void> => {
+export const forgotPassword = async (req: Request, res: Response): Promise<void> => {
+  // #swagger.tags = ['Auth (E01-E05)']
+  // #swagger.summary = 'E04: Minta tautan reset password (respons selalu netral)'
   try {
-    if (!req.user) {
-      res.status(401).json({ success: false, message: 'Autentikasi diperlukan.' });
-      return;
-    }
-
-    // Menggunakan Drizzle ORM Repository
-    const user = await userRepository.findById(req.user.userId);
-    if (!user) {
-      res.status(404).json({
-        success: false,
-        message: 'Pengguna tidak ditemukan.',
-      });
-      return;
-    }
-
-    res.json({
-      success: true,
-      data: user,
-    });
-  } catch (error: any) {
-    console.error('Error getProfile (Drizzle):', error);
-    res.status(500).json({
-      success: false,
-      message: 'Gagal mengambil profil: ' + error.message,
-    });
+    await authService.forgotPassword(req.body ?? {});
+    sendSuccess(res, null, 'Jika email terdaftar, tautan reset telah dikirim');
+  } catch (error) {
+    handleError(res, 'E04 forgotPassword', error);
   }
 };
 
-export const updateProfile = async (req: AuthRequest, res: Response): Promise<void> => {
+export const resetPassword = async (req: Request, res: Response): Promise<void> => {
+  // #swagger.tags = ['Auth (E01-E05)']
+  // #swagger.summary = 'E05: Atur ulang password menggunakan token reset'
   try {
-    if (!req.user) {
-      res.status(401).json({ success: false, message: 'Autentikasi diperlukan.' });
+    await authService.resetPassword(req.body ?? {});
+    sendSuccess(res, null, 'Password berhasil diperbarui');
+  } catch (error) {
+    handleError(res, 'E05 resetPassword', error);
+  }
+};
+
+export const getProfile = async (req: V1AuthRequest, res: Response): Promise<void> => {
+  // #swagger.tags = ['Auth (E01-E05)']
+  // #swagger.summary = 'Ambil profil akun yang sedang login'
+  try {
+    if (!req.v1User) {
+      sendError(res, 401, 'Silakan login untuk melanjutkan.', [{ code: 'ERR-AUTH-01' }]);
       return;
     }
+    const data = await authService.getProfile(req.v1User.user_id);
+    sendSuccess(res, data, 'Profil berhasil diambil.');
+  } catch (error) {
+    handleError(res, 'getProfile', error);
+  }
+};
 
-    const { fullName, phoneNumber, password, currentPassword } = req.body;
-
-    const user = await userRepository.findByIdWithPassword(req.user.userId);
-    if (!user) {
-      res.status(404).json({
-        success: false,
-        message: 'Pengguna tidak ditemukan.',
-      });
+export const updateProfile = async (req: V1AuthRequest, res: Response): Promise<void> => {
+  // #swagger.tags = ['Auth (E01-E05)']
+  // #swagger.summary = 'Perbarui profil akun yang sedang login'
+  try {
+    if (!req.v1User) {
+      sendError(res, 401, 'Silakan login untuk melanjutkan.', [{ code: 'ERR-AUTH-01' }]);
       return;
     }
-
-    const updatePayload: {
-      fullName?: string;
-      phoneNumber?: string | null;
-      passwordHash?: string;
-    } = {
-      fullName: fullName || user.fullName,
-      phoneNumber: phoneNumber !== undefined ? phoneNumber : user.phoneNumber,
-    };
-
-    if (password) {
-      if (!currentPassword) {
-        res.status(400).json({
-          success: false,
-          message: 'Password saat ini diperlukan untuk mengganti password baru.',
-        });
-        return;
-      }
-
-      const isMatch = await bcrypt.compare(currentPassword, user.passwordHash);
-      if (!isMatch) {
-        res.status(400).json({
-          success: false,
-          message: 'Password saat ini salah.',
-        });
-        return;
-      }
-
-      const salt = await bcrypt.genSalt(10);
-      updatePayload.passwordHash = await bcrypt.hash(password, salt);
-    }
-
-    // Menggunakan Drizzle ORM Repository
-    const updatedUser = await userRepository.update(req.user.userId, updatePayload);
-
-    res.json({
-      success: true,
-      message: 'Profil berhasil diperbarui.',
-      data: updatedUser,
-    });
-  } catch (error: any) {
-    console.error('Error updateProfile (Drizzle):', error);
-    res.status(500).json({
-      success: false,
-      message: 'Gagal memperbarui profil: ' + error.message,
-    });
+    const data = await authService.updateProfile(req.v1User.user_id, req.body ?? {});
+    sendSuccess(res, data, 'Profil berhasil diperbarui.');
+  } catch (error) {
+    handleError(res, 'updateProfile', error);
   }
 };

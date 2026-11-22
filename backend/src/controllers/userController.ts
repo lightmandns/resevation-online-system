@@ -1,218 +1,90 @@
 import { Response } from 'express';
-import bcrypt from 'bcryptjs';
-import { userRepository } from '../repositories/userRepository.js';
-import { AuthRequest, User } from '../types/index.js';
+import { V1AuthRequest } from '../middleware/v1AuthMiddleware.js';
+import { userService } from '../services/userService.js';
+import { sendSuccess, sendPaginated, sendError } from '../utils/apiResponse.js';
+import { getClientIp, ServiceError } from '../utils/errors.js';
+import { AuditActor } from '../utils/auditHelper.js';
 
-export const getAllUsers = async (req: AuthRequest, res: Response): Promise<void> => {
+const getActor = (req: V1AuthRequest): AuditActor => ({
+  userId: req.v1User?.user_id ?? null,
+  userEmail: req.v1User?.email ?? 'system',
+  ipAddress: getClientIp(req),
+});
+
+const handleError = (res: Response, tag: string, error: unknown): void => {
+  if (error instanceof ServiceError) {
+    sendError(res, error.statusCode, error.message, [
+      { code: error.code, ...(error.field ? { field: error.field } : {}) },
+    ]);
+    return;
+  }
+  console.error(`[${tag} Error]`, error);
+  sendError(res, 503, 'Layanan sedang mengalami gangguan. Silakan coba kembali.', [
+    { code: 'ERR-SYS-01' },
+  ]);
+};
+
+export const getAllUsers = async (req: V1AuthRequest, res: Response): Promise<void> => {
+  // #swagger.tags = ['User Management (Manajer)']
+  // #swagger.summary = 'Daftar seluruh akun pengguna (Khusus Manajer)'
   try {
-    const { search, role, status } = req.query;
-
-    let isActive: boolean | undefined = undefined;
-    if (status === 'active') isActive = true;
-    if (status === 'inactive') isActive = false;
-
-    // Menggunakan Drizzle ORM Repository
-    const userList = await userRepository.findAll({
-      search: search as string,
-      role: role as string,
-      isActive,
+    const { items, meta } = await userService.list({
+      role: req.query.role,
+      search: req.query.search,
+      include_inactive: req.query.include_inactive,
+      page: req.query.page,
+      per_page: req.query.per_page,
     });
-
-    res.json({
-      success: true,
-      count: userList.length,
-      data: userList as User[],
-    });
-  } catch (error: any) {
-    console.error('Error getAllUsers (Drizzle):', error);
-    res.status(500).json({
-      success: false,
-      message: 'Gagal mengambil data user: ' + error.message,
-    });
+    sendPaginated(res, items, meta, 'Daftar pengguna berhasil diambil.');
+  } catch (error) {
+    handleError(res, 'getAllUsers', error);
   }
 };
 
-export const getUserById = async (req: AuthRequest, res: Response): Promise<void> => {
+export const getUserById = async (req: V1AuthRequest, res: Response): Promise<void> => {
+  // #swagger.tags = ['User Management (Manajer)']
+  // #swagger.summary = 'Detail 1 akun pengguna (Khusus Manajer)'
   try {
-    const id = req.params.id as string;
-    const userId = parseInt(id, 10);
-
-    if (isNaN(userId)) {
-      res.status(400).json({ success: false, message: 'ID pengguna tidak valid.' });
-      return;
-    }
-
-    // Menggunakan Drizzle ORM Repository
-    const user = await userRepository.findById(userId);
-
-    if (!user) {
-      res.status(404).json({
-        success: false,
-        message: `Pengguna dengan ID ${id} tidak ditemukan.`,
-      });
-      return;
-    }
-
-    res.json({
-      success: true,
-      data: user as User,
-    });
-  } catch (error: any) {
-    console.error('Error getUserById (Drizzle):', error);
-    res.status(500).json({
-      success: false,
-      message: 'Gagal mengambil data user: ' + error.message,
-    });
+    const data = await userService.getById(String(req.params.id));
+    sendSuccess(res, data, 'Data pengguna berhasil diambil.');
+  } catch (error) {
+    handleError(res, 'getUserById', error);
   }
 };
 
-export const createUser = async (req: AuthRequest, res: Response): Promise<void> => {
+export const createUser = async (req: V1AuthRequest, res: Response): Promise<void> => {
+  // #swagger.tags = ['User Management (Manajer)']
+  // #swagger.summary = 'Buat akun staff/pengguna baru (Khusus Manajer)'
   try {
-    const { fullName, email, phoneNumber, password, role, isActive } = req.body;
-
-    if (!fullName || !email || !password) {
-      res.status(400).json({
-        success: false,
-        message: 'FullName, email, dan password wajib diisi.',
-      });
-      return;
-    }
-
-    // Cek duplikasi email via Drizzle
-    const existingUser = await userRepository.findByEmail(email);
-    if (existingUser) {
-      res.status(409).json({
-        success: false,
-        message: 'Email sudah terdaftar.',
-      });
-      return;
-    }
-
-    const salt = await bcrypt.genSalt(10);
-    const passwordHash = await bcrypt.hash(password, salt);
-
-    // Create via Drizzle
-    const newUser = await userRepository.create({
-      fullName: fullName.trim(),
-      email: email.trim().toLowerCase(),
-      phoneNumber: phoneNumber ? phoneNumber.trim() : null,
-      passwordHash,
-      role: role || 'Customer',
-      isActive: isActive !== undefined ? isActive : true,
-    });
-
-    res.status(201).json({
-      success: true,
-      message: 'User berhasil dibuat.',
-      data: newUser as User,
-    });
-  } catch (error: any) {
-    console.error('Error createUser (Drizzle):', error);
-    res.status(500).json({
-      success: false,
-      message: 'Gagal membuat user: ' + error.message,
-    });
+    const data = await userService.create(req.body ?? {}, getActor(req));
+    sendSuccess(res, data, 'Pengguna berhasil dibuat.', 201);
+  } catch (error) {
+    handleError(res, 'createUser', error);
   }
 };
 
-export const updateUser = async (req: AuthRequest, res: Response): Promise<void> => {
+export const updateUser = async (req: V1AuthRequest, res: Response): Promise<void> => {
+  // #swagger.tags = ['User Management (Manajer)']
+  // #swagger.summary = 'Perbarui data/role/status pengguna (Khusus Manajer)'
   try {
-    const id = req.params.id as string;
-    const userId = parseInt(id, 10);
-    const { fullName, email, phoneNumber, password, role, isActive } = req.body;
-
-    if (isNaN(userId)) {
-      res.status(400).json({ success: false, message: 'ID pengguna tidak valid.' });
-      return;
-    }
-
-    const existingUser = await userRepository.findById(userId);
-    if (!existingUser) {
-      res.status(404).json({
-        success: false,
-        message: `Pengguna dengan ID ${id} tidak ditemukan.`,
-      });
-      return;
-    }
-
-    if (email && email.toLowerCase() !== existingUser.email.toLowerCase()) {
-      const emailConflict = await userRepository.findByEmail(email);
-      if (emailConflict && emailConflict.userId !== userId) {
-        res.status(409).json({
-          success: false,
-          message: 'Email sudah digunakan oleh akun lain.',
-        });
-        return;
-      }
-    }
-
-    const updatePayload: {
-      fullName?: string;
-      email?: string;
-      phoneNumber?: string | null;
-      passwordHash?: string;
-      role?: string;
-      isActive?: boolean;
-    } = {};
-
-    if (fullName) updatePayload.fullName = fullName.trim();
-    if (email) updatePayload.email = email.trim().toLowerCase();
-    if (phoneNumber !== undefined) updatePayload.phoneNumber = phoneNumber ? phoneNumber.trim() : null;
-    if (role) updatePayload.role = role;
-    if (isActive !== undefined) updatePayload.isActive = isActive;
-
-    if (password) {
-      const salt = await bcrypt.genSalt(10);
-      updatePayload.passwordHash = await bcrypt.hash(password, salt);
-    }
-
-    // Update via Drizzle
-    const updatedUser = await userRepository.update(userId, updatePayload);
-
-    res.json({
-      success: true,
-      message: 'User berhasil diperbarui.',
-      data: updatedUser as User,
-    });
-  } catch (error: any) {
-    console.error('Error updateUser (Drizzle):', error);
-    res.status(500).json({
-      success: false,
-      message: 'Gagal memperbarui user: ' + error.message,
-    });
+    const data = await userService.update(String(req.params.id), req.body ?? {}, getActor(req));
+    sendSuccess(res, data, 'Data pengguna berhasil diperbarui.');
+  } catch (error) {
+    handleError(res, 'updateUser', error);
   }
 };
 
-export const deleteUser = async (req: AuthRequest, res: Response): Promise<void> => {
+export const deleteUser = async (req: V1AuthRequest, res: Response): Promise<void> => {
+  // #swagger.tags = ['User Management (Manajer)']
+  // #swagger.summary = 'Nonaktifkan (soft delete) akun pengguna (Khusus Manajer)'
   try {
-    const id = req.params.id as string;
-    const userId = parseInt(id, 10);
-
-    if (isNaN(userId)) {
-      res.status(400).json({ success: false, message: 'ID pengguna tidak valid.' });
+    if (!req.v1User) {
+      sendError(res, 401, 'Silakan login untuk melanjutkan.', [{ code: 'ERR-AUTH-01' }]);
       return;
     }
-
-    // Delete via Drizzle
-    const deletedUser = await userRepository.delete(userId);
-
-    if (!deletedUser) {
-      res.status(404).json({
-        success: false,
-        message: `Pengguna dengan ID ${id} tidak ditemukan.`,
-      });
-      return;
-    }
-
-    res.json({
-      success: true,
-      message: `User '${deletedUser.fullName}' berhasil dihapus.`,
-    });
-  } catch (error: any) {
-    console.error('Error deleteUser (Drizzle):', error);
-    res.status(500).json({
-      success: false,
-      message: 'Gagal menghapus user: ' + error.message,
-    });
+    await userService.remove(String(req.params.id), req.v1User.user_id, getActor(req));
+    sendSuccess(res, null, 'Pengguna berhasil dinonaktifkan.');
+  } catch (error) {
+    handleError(res, 'deleteUser', error);
   }
 };

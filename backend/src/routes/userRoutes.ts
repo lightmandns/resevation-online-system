@@ -4,26 +4,19 @@ import {
   getUserById,
   createUser,
   updateUser,
-  deleteUser
+  deleteUser,
 } from '../controllers/userController.js';
-import { verifyToken, requireRole } from '../middleware/authMiddleware.js';
+import { authenticateJwt, authorizeRoles } from '../middleware/v1AuthMiddleware.js';
 
 const router = Router();
 
-// Semua rute pengelolaan pengguna mewajibkan token autentikasi
-router.use(verifyToken);
+// Seluruh pengelolaan akun pengguna hanya untuk Manajer
+router.use(authenticateJwt, authorizeRoles('Manajer'));
 
-/**
- * Hak Akses Khusus:
- * - GET /api/users & GET /api/users/:id: Hanya dapat dilihat oleh Manajer (data sensitif user)
- * - POST /api/users (Buat user/staff): Eksklusif Manajer
- * - PUT /api/users/:id (Update data/role/status user): Eksklusif Manajer
- * - DELETE /api/users/:id (Hapus user): Eksklusif Manajer
- */
-router.get('/', requireRole('Manajer'), getAllUsers);
-router.get('/:id', requireRole('Manajer'), getUserById);
-router.post('/', requireRole('Manajer'), createUser);
-router.put('/:id', requireRole('Manajer'), updateUser);
-router.delete('/:id', requireRole('Manajer'), deleteUser);
+router.get('/', getAllUsers);
+router.get('/:id', getUserById);
+router.post('/', createUser);
+router.patch('/:id', updateUser);
+router.delete('/:id', deleteUser);
 
 export default router;
