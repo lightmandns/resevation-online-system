@@ -21,6 +21,15 @@ const handleError = (res: Response, tag: string, error: unknown): void => {
 export const register = async (req: Request, res: Response): Promise<void> => {
   // #swagger.tags = ['Auth (E01-E05)']
   // #swagger.summary = 'E01: Registrasi pelanggan baru (role otomatis Customer, bcrypt cost 12)'
+  // #swagger.security = []
+  /* #swagger.requestBody = {
+        required: true,
+        content: {
+          "application/json": {
+            schema: { $ref: "#/components/schemas/RegisterRequest" }
+          }
+        }
+     } */
   try {
     const data = await authService.register(req.body ?? {});
     sendSuccess(res, data, 'Registrasi berhasil', 201);
@@ -32,6 +41,15 @@ export const register = async (req: Request, res: Response): Promise<void> => {
 export const login = async (req: Request, res: Response): Promise<void> => {
   // #swagger.tags = ['Auth (E01-E05)']
   // #swagger.summary = 'E02: Login semua role (JWT 24 jam / 30 hari Ingat Saya, lockout 3x gagal)'
+  // #swagger.security = []
+  /* #swagger.requestBody = {
+        required: true,
+        content: {
+          "application/json": {
+            schema: { $ref: "#/components/schemas/LoginRequest" }
+          }
+        }
+     } */
   try {
     const data = await authService.login(req.body ?? {}, getClientIp(req));
     sendSuccess(res, data, 'Login berhasil');
@@ -66,6 +84,15 @@ export const logout = async (req: V1AuthRequest, res: Response): Promise<void> =
 export const forgotPassword = async (req: Request, res: Response): Promise<void> => {
   // #swagger.tags = ['Auth (E01-E05)']
   // #swagger.summary = 'E04: Minta tautan reset password (respons selalu netral)'
+  // #swagger.security = []
+  /* #swagger.requestBody = {
+        required: true,
+        content: {
+          "application/json": {
+            schema: { $ref: "#/components/schemas/ForgotPasswordRequest" }
+          }
+        }
+     } */
   try {
     await authService.forgotPassword(req.body ?? {});
     sendSuccess(res, null, 'Jika email terdaftar, tautan reset telah dikirim');
@@ -77,6 +104,15 @@ export const forgotPassword = async (req: Request, res: Response): Promise<void>
 export const resetPassword = async (req: Request, res: Response): Promise<void> => {
   // #swagger.tags = ['Auth (E01-E05)']
   // #swagger.summary = 'E05: Atur ulang password menggunakan token reset'
+  // #swagger.security = []
+  /* #swagger.requestBody = {
+        required: true,
+        content: {
+          "application/json": {
+            schema: { $ref: "#/components/schemas/ResetPasswordRequest" }
+          }
+        }
+     } */
   try {
     await authService.resetPassword(req.body ?? {});
     sendSuccess(res, null, 'Password berhasil diperbarui');
@@ -103,6 +139,14 @@ export const getProfile = async (req: V1AuthRequest, res: Response): Promise<voi
 export const updateProfile = async (req: V1AuthRequest, res: Response): Promise<void> => {
   // #swagger.tags = ['Auth (E01-E05)']
   // #swagger.summary = 'Perbarui profil akun yang sedang login'
+  /* #swagger.requestBody = {
+        required: true,
+        content: {
+          "application/json": {
+            schema: { $ref: "#/components/schemas/UpdateProfileRequest" }
+          }
+        }
+     } */
   try {
     if (!req.v1User) {
       sendError(res, 401, 'Silakan login untuk melanjutkan.', [{ code: 'ERR-AUTH-01' }]);
