@@ -49,6 +49,14 @@ export const createRegularReservation = async (
 ): Promise<void> => {
   // #swagger.tags = ['Reservasi']
   // #swagger.summary = 'E11: Buat reservasi reguler secara atomik & tahan blok selama 10 menit'
+  /* #swagger.requestBody = {
+        required: true,
+        content: {
+          "application/json": {
+            schema: { $ref: "#/components/schemas/CreateRegularReservationRequest" }
+          }
+        }
+     } */
   try {
     if (!req.v1User) {
       sendError(res, 401, 'Silakan login untuk melanjutkan.', [{ code: 'ERR-AUTH-01' }]);
@@ -190,6 +198,14 @@ export const createSpecialReservation = async (
 ): Promise<void> => {
   // #swagger.tags = ['Reservasi']
   // #swagger.summary = 'E29: Input reservasi layanan khusus oleh Admin (hasil diskusi WhatsApp)'
+  /* #swagger.requestBody = {
+        required: true,
+        content: {
+          "application/json": {
+            schema: { $ref: "#/components/schemas/CreateSpecialReservationRequest" }
+          }
+        }
+     } */
   try {
     if (!req.v1User) {
       sendError(res, 401, 'Silakan login untuk melanjutkan.', [{ code: 'ERR-AUTH-01' }]);

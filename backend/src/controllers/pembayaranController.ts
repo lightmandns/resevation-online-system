@@ -34,6 +34,14 @@ const handleError = (
 export const createPayment = async (req: V1AuthRequest, res: Response): Promise<void> => {
   // #swagger.tags = ['Pembayaran (E15-E20)']
   // #swagger.summary = 'E15: Mulai pembayaran DP atau Pelunasan via Midtrans Virtual Account (10 menit)'
+  /* #swagger.requestBody = {
+        required: true,
+        content: {
+          "application/json": {
+            schema: { $ref: "#/components/schemas/CreatePaymentRequest" }
+          }
+        }
+     } */
   try {
     if (!req.v1User) {
       sendError(res, 401, 'Silakan login untuk melanjutkan.', [{ code: 'ERR-AUTH-01' }]);
@@ -81,6 +89,15 @@ export const handleMidtransCallback = async (
 ): Promise<void> => {
   // #swagger.tags = ['Pembayaran (E15-E20)']
   // #swagger.summary = 'E17: Webhook / HTTP Notification dari Midtrans (verifikasi signature_key SHA-512)'
+  // #swagger.security = []
+  /* #swagger.requestBody = {
+        required: true,
+        content: {
+          "application/json": {
+            schema: { $ref: "#/components/schemas/MidtransCallbackRequest" }
+          }
+        }
+     } */
   try {
     const data = await pembayaranService.handleMidtransCallback(
       req.body ?? {},
@@ -105,6 +122,28 @@ export const uploadTransferProof = async (
 ): Promise<void> => {
   // #swagger.tags = ['Pembayaran (E15-E20)']
   // #swagger.summary = 'E18: Unggah bukti transfer manual (jalur cadangan, JPG/PNG maks 10 MB)'
+  /* #swagger.requestBody = {
+        required: true,
+        content: {
+          "multipart/form-data": {
+            schema: {
+              type: "object",
+              required: ["jenis", "berkas_bukti"],
+              properties: {
+                jenis: {
+                  type: "string",
+                  enum: ["DP", "Pelunasan"],
+                  example: "DP"
+                },
+                berkas_bukti: {
+                  type: "string",
+                  format: "binary"
+                }
+              }
+            }
+          }
+        }
+     } */
   try {
     if (!req.v1User) {
       sendError(res, 401, 'Silakan login untuk melanjutkan.', [{ code: 'ERR-AUTH-01' }]);
@@ -156,6 +195,14 @@ export const verifyManualPayment = async (
 ): Promise<void> => {
   // #swagger.tags = ['Pembayaran (E15-E20)']
   // #swagger.summary = 'E20: Setujui atau tolak bukti transfer manual (Admin/Manajer)'
+  /* #swagger.requestBody = {
+        required: true,
+        content: {
+          "application/json": {
+            schema: { $ref: "#/components/schemas/VerifyManualPaymentRequest" }
+          }
+        }
+     } */
   try {
     if (!req.v1User) {
       sendError(res, 401, 'Silakan login untuk melanjutkan.', [{ code: 'ERR-AUTH-01' }]);

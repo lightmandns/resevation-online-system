@@ -1107,6 +1107,16 @@
           "default": {
             "description": ""
           }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateRegularReservationRequest"
+              }
+            }
+          }
         }
       },
       "get": {
@@ -1292,6 +1302,16 @@
           "default": {
             "description": ""
           }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateSpecialReservationRequest"
+              }
+            }
+          }
         }
       }
     },
@@ -1412,6 +1432,16 @@
           "default": {
             "description": ""
           }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePaymentRequest"
+              }
+            }
+          }
         }
       },
       "get": {
@@ -1479,6 +1509,34 @@
           "default": {
             "description": ""
           }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "jenis",
+                  "berkas_bukti"
+                ],
+                "properties": {
+                  "jenis": {
+                    "type": "string",
+                    "enum": [
+                      "DP",
+                      "Pelunasan"
+                    ],
+                    "example": "DP"
+                  },
+                  "berkas_bukti": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
         }
       }
     },
@@ -1492,6 +1550,17 @@
         "responses": {
           "default": {
             "description": ""
+          }
+        },
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MidtransCallbackRequest"
+              }
+            }
           }
         }
       }
@@ -1567,6 +1636,16 @@
         "responses": {
           "default": {
             "description": ""
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifyManualPaymentRequest"
+              }
+            }
           }
         }
       }
@@ -2277,6 +2356,161 @@
           "password": {
             "type": "string",
             "example": "NewPassword123"
+          }
+        }
+      },
+      "CreateRegularReservationRequest": {
+        "type": "object",
+        "properties": {
+          "jenis_layanan": {
+            "type": "string",
+            "example": "Reguler"
+          },
+          "jadwal_reservasi": {
+            "type": "string",
+            "example": "2026-12-20T18:00:00+07:00"
+          },
+          "jumlah_tamu": {
+            "type": "number",
+            "example": 4
+          },
+          "blok_ids": {
+            "type": "array",
+            "example": [
+              "00000000-0000-0000-0000-000000000000"
+            ],
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "CreateSpecialReservationRequest": {
+        "type": "object",
+        "properties": {
+          "nama_pemesan": {
+            "type": "string",
+            "example": "Siti Aminah"
+          },
+          "nomor_whatsapp": {
+            "type": "string",
+            "example": "6281234567890"
+          },
+          "email_pemesan": {
+            "type": "string",
+            "example": "siti@example.test"
+          },
+          "jenis_acara": {
+            "type": "string",
+            "example": "Ulang Tahun"
+          },
+          "jadwal_reservasi": {
+            "type": "string",
+            "example": "2026-12-20T18:00:00+07:00"
+          },
+          "jumlah_tamu": {
+            "type": "number",
+            "example": 20
+          },
+          "blok_ids": {
+            "type": "array",
+            "example": [
+              "00000000-0000-0000-0000-000000000000"
+            ],
+            "items": {
+              "type": "string"
+            }
+          },
+          "status_pembayaran": {
+            "type": "string",
+            "example": "dp"
+          },
+          "pesanan_menu": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "menu_id": {
+                  "type": "string",
+                  "example": "00000000-0000-0000-0000-000000000000"
+                },
+                "nama_menu": {
+                  "type": "string",
+                  "example": "Paket Prasmanan Spesial"
+                },
+                "jumlah_porsi": {
+                  "type": "number",
+                  "example": 20
+                },
+                "harga_satuan": {
+                  "type": "number",
+                  "example": 75000
+                },
+                "keterangan": {
+                  "type": "string",
+                  "example": "Tanpa kacang"
+                }
+              }
+            }
+          }
+        }
+      },
+      "CreatePaymentRequest": {
+        "type": "object",
+        "properties": {
+          "jenis": {
+            "type": "string",
+            "example": "DP"
+          },
+          "bank": {
+            "type": "string",
+            "example": "bca"
+          },
+          "setuju_ketentuan": {
+            "type": "boolean",
+            "example": true
+          }
+        }
+      },
+      "MidtransCallbackRequest": {
+        "type": "object",
+        "properties": {
+          "order_id": {
+            "type": "string",
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "transaction_id": {
+            "type": "string",
+            "example": "midtrans-trx-001"
+          },
+          "transaction_status": {
+            "type": "string",
+            "example": "settlement"
+          },
+          "status_code": {
+            "type": "string",
+            "example": "200"
+          },
+          "gross_amount": {
+            "type": "string",
+            "example": "50000.00"
+          },
+          "signature_key": {
+            "type": "string",
+            "example": "<sha512_signature_key>"
+          }
+        }
+      },
+      "VerifyManualPaymentRequest": {
+        "type": "object",
+        "properties": {
+          "keputusan": {
+            "type": "string",
+            "example": "setuju"
+          },
+          "catatan": {
+            "type": "string",
+            "example": "DP terverifikasi"
           }
         }
       }
