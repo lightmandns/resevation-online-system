@@ -3,7 +3,7 @@
   "info": {
     "title": "Mazaya Reservation & Branding API (v1)",
     "version": "1.2.0",
-    "description": "Dokumentasi Interaktif & Pengujian REST API Sistem Reservasi & Branding Restoran Mazaya (E01-E56)"
+    "description": "Dokumentasi Interaktif & Pengujian REST API Sistem Reservasi & Branding Restoran Mazaya"
   },
   "servers": [
     {
@@ -24,7 +24,7 @@
     "/api/v1/auth/register": {
       "post": {
         "tags": [
-          "Auth (E01-E05)"
+          "Auth"
         ],
         "summary": "E01: Registrasi pelanggan baru (role otomatis Customer, bcrypt cost 12)",
         "description": "",
@@ -49,7 +49,7 @@
     "/api/v1/auth/login": {
       "post": {
         "tags": [
-          "Auth (E01-E05)"
+          "Auth"
         ],
         "summary": "E02: Login semua role (JWT 24 jam / 30 hari Ingat Saya, lockout 3x gagal)",
         "description": "",
@@ -74,7 +74,7 @@
     "/api/v1/auth/password/forgot": {
       "post": {
         "tags": [
-          "Auth (E01-E05)"
+          "Auth"
         ],
         "summary": "E04: Minta tautan reset password (respons selalu netral)",
         "description": "",
@@ -99,7 +99,7 @@
     "/api/v1/auth/password/reset": {
       "post": {
         "tags": [
-          "Auth (E01-E05)"
+          "Auth"
         ],
         "summary": "E05: Atur ulang password menggunakan token reset",
         "description": "",
@@ -124,7 +124,7 @@
     "/api/v1/auth/logout": {
       "post": {
         "tags": [
-          "Auth (E01-E05)"
+          "Auth"
         ],
         "summary": "E03: Logout (blacklist token JWT & catat audit log)",
         "description": "",
@@ -147,7 +147,7 @@
     "/api/v1/auth/me": {
       "get": {
         "tags": [
-          "Auth (E01-E05)"
+          "Auth"
         ],
         "summary": "Ambil profil akun yang sedang login",
         "description": "",
@@ -170,7 +170,7 @@
     "/api/v1/auth/profile": {
       "put": {
         "tags": [
-          "Auth (E01-E05)"
+          "Auth"
         ],
         "summary": "Perbarui profil akun yang sedang login",
         "description": "",
@@ -276,6 +276,16 @@
           "default": {
             "description": ""
           }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateUserRequest"
+              }
+            }
+          }
         }
       }
     },
@@ -335,6 +345,16 @@
         "responses": {
           "default": {
             "description": ""
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserRequest"
+              }
+            }
           }
         }
       },
@@ -553,6 +573,16 @@
           "default": {
             "description": ""
           }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateMenuRequest"
+              }
+            }
+          }
         }
       }
     },
@@ -583,6 +613,16 @@
         "responses": {
           "default": {
             "description": ""
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateMenuRequest"
+              }
+            }
           }
         }
       },
@@ -692,6 +732,16 @@
           "default": {
             "description": ""
           }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePromotionRequest"
+              }
+            }
+          }
         }
       }
     },
@@ -722,6 +772,16 @@
         "responses": {
           "default": {
             "description": ""
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePromotionRequest"
+              }
+            }
           }
         }
       },
@@ -847,6 +907,16 @@
           "default": {
             "description": ""
           }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateBlockRequest"
+              }
+            }
+          }
         }
       }
     },
@@ -877,6 +947,16 @@
         "responses": {
           "default": {
             "description": ""
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateBlockRequest"
+              }
+            }
           }
         }
       },
@@ -986,6 +1066,16 @@
           "default": {
             "description": ""
           }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateIngredientReceiptRequest"
+              }
+            }
+          }
         }
       }
     },
@@ -1060,6 +1150,16 @@
         "responses": {
           "default": {
             "description": ""
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateStockQuantityRequest"
+              }
+            }
           }
         }
       }
@@ -1407,7 +1507,7 @@
     "/api/v1/reservations/{id}/payments": {
       "post": {
         "tags": [
-          "Pembayaran (E15-E20)"
+          "Pembayaran"
         ],
         "summary": "E15: Mulai pembayaran DP atau Pelunasan via Midtrans Virtual Account (10 menit)",
         "description": "",
@@ -1446,7 +1546,7 @@
       },
       "get": {
         "tags": [
-          "Pembayaran (E15-E20)"
+          "Pembayaran"
         ],
         "summary": "E16: Cek status pembayaran DP dan Pelunasan pada reservasi",
         "description": "",
@@ -1484,7 +1584,7 @@
     "/api/v1/reservations/{id}/payments/proof": {
       "post": {
         "tags": [
-          "Pembayaran (E15-E20)"
+          "Pembayaran"
         ],
         "summary": "E18: Unggah bukti transfer manual (jalur cadangan, JPG/PNG maks 10 MB)",
         "description": "",
@@ -1543,7 +1643,7 @@
     "/api/v1/payments/gateway/callback": {
       "post": {
         "tags": [
-          "Pembayaran (E15-E20)"
+          "Pembayaran"
         ],
         "summary": "E17: Webhook / HTTP Notification dari Midtrans (verifikasi signature_key SHA-512)",
         "description": "",
@@ -1568,7 +1668,7 @@
     "/api/v1/admin/payments": {
       "get": {
         "tags": [
-          "Pembayaran (E15-E20)"
+          "Pembayaran"
         ],
         "summary": "E19: Daftar pembayaran menunggu verifikasi manual (Admin/Manajer)",
         "description": "",
@@ -1612,7 +1712,7 @@
     "/api/v1/admin/payments/{id}/verification": {
       "post": {
         "tags": [
-          "Pembayaran (E15-E20)"
+          "Pembayaran"
         ],
         "summary": "E20: Setujui atau tolak bukti transfer manual (Admin/Manajer)",
         "description": "",
@@ -1653,7 +1753,7 @@
     "/api/v1/reservations/{id}/orders": {
       "post": {
         "tags": [
-          "Pesanan Menu (E22-E23, E55-E56)"
+          "Pesanan Menu"
         ],
         "summary": "E22: Kirim pesanan menu pre-order katalog & menu request (maks H-1)",
         "description": "",
@@ -1678,11 +1778,21 @@
           "default": {
             "description": ""
           }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateReservationOrdersRequest"
+              }
+            }
+          }
         }
       },
       "get": {
         "tags": [
-          "Pesanan Menu (E22-E23, E55-E56)"
+          "Pesanan Menu"
         ],
         "summary": "E23: Lihat daftar pesanan pre-order dan estimasi total pada reservasi",
         "description": "",
@@ -1713,7 +1823,7 @@
     "/api/v1/admin/menu-requests": {
       "get": {
         "tags": [
-          "Pesanan Menu (E22-E23, E55-E56)"
+          "Pesanan Menu"
         ],
         "summary": "E55: Daftar menu request yang diajukan Customer (Admin/Manajer)",
         "description": "",
@@ -1757,7 +1867,7 @@
     "/api/v1/admin/menu-requests/{id}/decision": {
       "patch": {
         "tags": [
-          "Pesanan Menu (E22-E23, E55-E56)"
+          "Pesanan Menu"
         ],
         "summary": "E56: Admin terima (set harga satuan) atau tolak menu request",
         "description": "",
@@ -1782,13 +1892,23 @@
           "default": {
             "description": ""
           }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DecideMenuRequest"
+              }
+            }
+          }
         }
       }
     },
     "/api/v1/reservations/{id}/review-eligibility": {
       "get": {
         "tags": [
-          "Ulasan & Rating (E24-E25, E50)"
+          "Ulasan & Rating"
         ],
         "summary": "E24: Cek apakah reservasi sudah memenuhi syarat memberikan rating & ulasan",
         "description": "",
@@ -1819,7 +1939,7 @@
     "/api/v1/reservations/{id}/reviews": {
       "post": {
         "tags": [
-          "Ulasan & Rating (E24-E25, E50)"
+          "Ulasan & Rating"
         ],
         "summary": "E25: Kirim rating (1-5) dan komentar ulasan untuk reservasi yang selesai",
         "description": "",
@@ -1844,13 +1964,23 @@
           "default": {
             "description": ""
           }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubmitReviewRequest"
+              }
+            }
+          }
         }
       }
     },
     "/api/v1/manager/reviews": {
       "get": {
         "tags": [
-          "Ulasan & Rating (E24-E25, E50)"
+          "Ulasan & Rating"
         ],
         "summary": "E50: Daftar rating & ulasan pelanggan beserta skor rata-rata (Khusus Manajer)",
         "description": "",
@@ -1908,7 +2038,7 @@
     "/api/v1/audit-logs": {
       "get": {
         "tags": [
-          "Audit Log (E46-E47, E54)"
+          "Audit Log"
         ],
         "summary": "E46: Daftar audit log perubahan data (Khusus Manajer, read-only)",
         "description": "",
@@ -1980,7 +2110,7 @@
     "/api/v1/audit-logs/{id}": {
       "get": {
         "tags": [
-          "Audit Log (E46-E47, E54)"
+          "Audit Log"
         ],
         "summary": "E47: Detail 1 entri audit log termasuk old_values & new_values JSON (Khusus Manajer)",
         "description": "",
@@ -2011,7 +2141,7 @@
     "/api/v1/security-logs": {
       "get": {
         "tags": [
-          "Audit Log (E46-E47, E54)"
+          "Audit Log"
         ],
         "summary": "E54: Daftar log keamanan (login, logout, akses ditolak, verifikasi bayar) (Khusus Manajer)",
         "description": "",
@@ -2076,7 +2206,7 @@
     "/api/v1/manager/dashboard": {
       "get": {
         "tags": [
-          "Dashboard Manajer (E49)"
+          "Dashboard Manajer"
         ],
         "summary": "E49: Ringkasan reservasi, pembayaran DP & Pelunasan, rating, dan aktivitas operasional",
         "description": "",
@@ -2120,7 +2250,7 @@
     "/api/v1/notifications": {
       "get": {
         "tags": [
-          "Notifikasi (E51)"
+          "Notifikasi"
         ],
         "summary": "E51: Daftar notifikasi in-app milik pengguna yang sedang login",
         "description": "",
@@ -2218,7 +2348,7 @@
     "/api/v1/settings": {
       "get": {
         "tags": [
-          "Settings (E52-E53)"
+          "Settings"
         ],
         "summary": "E52: Baca konfigurasi sistem (Khusus Manajer)",
         "description": "",
@@ -2239,7 +2369,7 @@
       },
       "patch": {
         "tags": [
-          "Settings (E52-E53)"
+          "Settings"
         ],
         "summary": "E53: Perbarui konfigurasi sistem + catat SETTING_UPDATED di audit log (Khusus Manajer)",
         "description": "",
@@ -2255,6 +2385,16 @@
         "responses": {
           "default": {
             "description": ""
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateSettingsRequest"
+              }
+            }
           }
         }
       }
@@ -2511,6 +2651,376 @@
           "catatan": {
             "type": "string",
             "example": "DP terverifikasi"
+          }
+        }
+      },
+      "CreateBlockRequest": {
+        "type": "object",
+        "properties": {
+          "kode_blok": {
+            "type": "string",
+            "example": "BLOK-VIP-01"
+          },
+          "kapasitas": {
+            "type": "number",
+            "example": 8
+          },
+          "nominal_dp": {
+            "type": "number",
+            "example": 100000
+          },
+          "fasilitas": {
+            "type": "string",
+            "example": "AC, Sofa, Smart TV, Stop Kontak"
+          },
+          "foto_url": {
+            "type": "string",
+            "example": "https://example.com/images/blok-vip-01.jpg"
+          }
+        }
+      },
+      "UpdateBlockRequest": {
+        "type": "object",
+        "properties": {
+          "kode_blok": {
+            "type": "string",
+            "example": "BLOK-VIP-01"
+          },
+          "kapasitas": {
+            "type": "number",
+            "example": 10
+          },
+          "nominal_dp": {
+            "type": "number",
+            "example": 150000
+          },
+          "fasilitas": {
+            "type": "string",
+            "example": "AC, Sofa, Smart TV, Stop Kontak, Karaoke"
+          },
+          "foto_url": {
+            "type": "string",
+            "example": "https://example.com/images/blok-vip-01.jpg"
+          },
+          "status_ketersediaan": {
+            "type": "string",
+            "example": "Tersedia"
+          }
+        }
+      },
+      "CreateReservationOrdersRequest": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "menu_id": {
+                  "type": "string",
+                  "example": "00000000-0000-0000-0000-000000000000"
+                },
+                "jumlah_porsi": {
+                  "type": "number",
+                  "example": 4
+                }
+              }
+            }
+          },
+          "request_items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "nama_menu": {
+                  "type": "string",
+                  "example": "Nasi Tumpeng Spesial"
+                },
+                "deskripsi": {
+                  "type": "string",
+                  "example": "Tambahan sambal terasi dan lalapan segar"
+                },
+                "jumlah_porsi": {
+                  "type": "number",
+                  "example": 20
+                }
+              }
+            }
+          }
+        }
+      },
+      "CreateMenuRequest": {
+        "type": "object",
+        "properties": {
+          "nama": {
+            "type": "string",
+            "example": "Nasi Goreng Mazaya"
+          },
+          "kategori": {
+            "type": "string",
+            "example": "Reguler"
+          },
+          "harga": {
+            "type": "number",
+            "example": 35000
+          },
+          "tersedia": {
+            "type": "boolean",
+            "example": true
+          },
+          "minimal_porsi": {
+            "type": "number",
+            "example": 1
+          },
+          "deskripsi": {
+            "type": "string",
+            "example": "Nasi goreng rempah khas Mazaya dengan ayam suwir dan telur mata sapi"
+          },
+          "foto_url": {
+            "type": "string",
+            "example": "https://example.com/images/nasi-goreng.jpg"
+          }
+        }
+      },
+      "UpdateMenuRequest": {
+        "type": "object",
+        "properties": {
+          "nama": {
+            "type": "string",
+            "example": "Nasi Goreng Mazaya Spesial"
+          },
+          "kategori": {
+            "type": "string",
+            "example": "Reguler"
+          },
+          "harga": {
+            "type": "number",
+            "example": 38000
+          },
+          "tersedia": {
+            "type": "boolean",
+            "example": true
+          },
+          "minimal_porsi": {
+            "type": "number",
+            "example": 1
+          },
+          "deskripsi": {
+            "type": "string",
+            "example": "Nasi goreng rempah khas Mazaya porsi spesial"
+          },
+          "foto_url": {
+            "type": "string",
+            "example": "https://example.com/images/nasi-goreng.jpg"
+          }
+        }
+      },
+      "CreatePromotionRequest": {
+        "type": "object",
+        "properties": {
+          "judul": {
+            "type": "string",
+            "example": "Promo Akhir Tahun 20%"
+          },
+          "deskripsi": {
+            "type": "string",
+            "example": "Diskon 20% untuk semua paket reservasi keluarga di bulan Desember."
+          },
+          "tanggal_mulai": {
+            "type": "string",
+            "example": "2026-12-01"
+          },
+          "tanggal_selesai": {
+            "type": "string",
+            "example": "2026-12-31"
+          },
+          "gambar_url": {
+            "type": "string",
+            "example": "https://example.com/images/promo-desember.jpg"
+          },
+          "aktif": {
+            "type": "boolean",
+            "example": true
+          }
+        }
+      },
+      "UpdatePromotionRequest": {
+        "type": "object",
+        "properties": {
+          "judul": {
+            "type": "string",
+            "example": "Promo Akhir Tahun 25%"
+          },
+          "deskripsi": {
+            "type": "string",
+            "example": "Diskon 25% untuk reservasi keluarga di bulan Desember."
+          },
+          "tanggal_mulai": {
+            "type": "string",
+            "example": "2026-12-01"
+          },
+          "tanggal_selesai": {
+            "type": "string",
+            "example": "2026-12-31"
+          },
+          "gambar_url": {
+            "type": "string",
+            "example": "https://example.com/images/promo-desember.jpg"
+          },
+          "aktif": {
+            "type": "boolean",
+            "example": true
+          }
+        }
+      },
+      "CreateIngredientReceiptRequest": {
+        "type": "object",
+        "properties": {
+          "nama_bahan": {
+            "type": "string",
+            "example": "Beras Pandan Wangi"
+          },
+          "satuan": {
+            "type": "string",
+            "example": "kg"
+          },
+          "jumlah": {
+            "type": "number",
+            "example": 25
+          },
+          "harga": {
+            "type": "number",
+            "example": 16000
+          },
+          "tanggal_pencatatan": {
+            "type": "string",
+            "example": "2026-11-26"
+          }
+        }
+      },
+      "CreateUserRequest": {
+        "type": "object",
+        "properties": {
+          "nama": {
+            "type": "string",
+            "example": "Rina Staff"
+          },
+          "email": {
+            "type": "string",
+            "example": "rina.staff@mazaya.test"
+          },
+          "no_whatsapp": {
+            "type": "string",
+            "example": "6281234567892"
+          },
+          "password": {
+            "type": "string",
+            "example": "Password123"
+          },
+          "role": {
+            "type": "string",
+            "example": "Admin"
+          },
+          "is_active": {
+            "type": "boolean",
+            "example": true
+          }
+        }
+      },
+      "UpdateUserRequest": {
+        "type": "object",
+        "properties": {
+          "nama": {
+            "type": "string",
+            "example": "Rina Staff Updated"
+          },
+          "no_whatsapp": {
+            "type": "string",
+            "example": "6281234567893"
+          },
+          "role": {
+            "type": "string",
+            "example": "Admin"
+          },
+          "is_active": {
+            "type": "boolean",
+            "example": true
+          }
+        }
+      },
+      "UpdateStockQuantityRequest": {
+        "type": "object",
+        "properties": {
+          "jumlah_stok_baru": {
+            "type": "number",
+            "example": 40
+          }
+        }
+      },
+      "DecideMenuRequest": {
+        "type": "object",
+        "properties": {
+          "keputusan": {
+            "type": "string",
+            "example": "TERIMA"
+          },
+          "harga_satuan": {
+            "type": "number",
+            "example": 45000
+          },
+          "catatan": {
+            "type": "string",
+            "example": "Menu request disetujui dengan harga Rp 45.000/porsi"
+          }
+        }
+      },
+      "SubmitReviewRequest": {
+        "type": "object",
+        "properties": {
+          "rating": {
+            "type": "number",
+            "example": 5
+          },
+          "komentar": {
+            "type": "string",
+            "example": "Makanan lezat, pelayanan ramah, tempat sangat nyaman!"
+          }
+        }
+      },
+      "UpdateSettingsRequest": {
+        "type": "object",
+        "properties": {
+          "min_porsi_request": {
+            "type": "number",
+            "example": 20
+          },
+          "batas_waktu_dp_menit": {
+            "type": "number",
+            "example": 10
+          },
+          "batas_waktu_pelunasan_menit": {
+            "type": "number",
+            "example": 10
+          },
+          "durasi_slot_jam": {
+            "type": "number",
+            "example": 3
+          },
+          "batas_submit_menu_hari": {
+            "type": "number",
+            "example": 1
+          },
+          "jam_buka": {
+            "type": "string",
+            "example": "10:00"
+          },
+          "jam_tutup": {
+            "type": "string",
+            "example": "22:00"
+          },
+          "whatsapp_admin": {
+            "type": "string",
+            "example": "6281234567890"
           }
         }
       }

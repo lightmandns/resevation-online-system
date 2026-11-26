@@ -55,6 +55,14 @@ export const getUserById = async (req: V1AuthRequest, res: Response): Promise<vo
 export const createUser = async (req: V1AuthRequest, res: Response): Promise<void> => {
   // #swagger.tags = ['User Management (Manajer)']
   // #swagger.summary = 'Buat akun staff/pengguna baru (Khusus Manajer)'
+  /* #swagger.requestBody = {
+        required: true,
+        content: {
+          "application/json": {
+            schema: { $ref: "#/components/schemas/CreateUserRequest" }
+          }
+        }
+     } */
   try {
     const data = await userService.create(req.body ?? {}, getActor(req));
     sendSuccess(res, data, 'Pengguna berhasil dibuat.', 201);
@@ -66,6 +74,14 @@ export const createUser = async (req: V1AuthRequest, res: Response): Promise<voi
 export const updateUser = async (req: V1AuthRequest, res: Response): Promise<void> => {
   // #swagger.tags = ['User Management (Manajer)']
   // #swagger.summary = 'Perbarui data/role/status pengguna (Khusus Manajer)'
+  /* #swagger.requestBody = {
+        required: true,
+        content: {
+          "application/json": {
+            schema: { $ref: "#/components/schemas/UpdateUserRequest" }
+          }
+        }
+     } */
   try {
     const data = await userService.update(String(req.params.id), req.body ?? {}, getActor(req));
     sendSuccess(res, data, 'Data pengguna berhasil diperbarui.');

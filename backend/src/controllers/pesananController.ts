@@ -43,6 +43,14 @@ export const createReservationOrders = async (
 ): Promise<void> => {
   // #swagger.tags = ['Pesanan Menu (E22-E23, E55-E56)']
   // #swagger.summary = 'E22: Kirim pesanan menu pre-order katalog & menu request (maks H-1)'
+  /* #swagger.requestBody = {
+        required: true,
+        content: {
+          "application/json": {
+            schema: { $ref: "#/components/schemas/CreateReservationOrdersRequest" }
+          }
+        }
+     } */
   try {
     if (!req.v1User) {
       sendError(res, 401, 'Silakan login untuk melanjutkan.', [{ code: 'ERR-AUTH-01' }]);
@@ -111,6 +119,14 @@ export const decideMenuRequest = async (
 ): Promise<void> => {
   // #swagger.tags = ['Pesanan Menu (E22-E23, E55-E56)']
   // #swagger.summary = 'E56: Admin terima (set harga satuan) atau tolak menu request'
+  /* #swagger.requestBody = {
+        required: true,
+        content: {
+          "application/json": {
+            schema: { $ref: "#/components/schemas/DecideMenuRequest" }
+          }
+        }
+     } */
   try {
     if (!req.v1User) {
       sendError(res, 401, 'Silakan login untuk melanjutkan.', [{ code: 'ERR-AUTH-01' }]);

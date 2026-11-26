@@ -31,6 +31,14 @@ export const getSettings = async (req: V1AuthRequest, res: Response): Promise<vo
 export const updateSettings = async (req: V1AuthRequest, res: Response): Promise<void> => {
   // #swagger.tags = ['Settings (E52-E53)']
   // #swagger.summary = 'E53: Perbarui konfigurasi sistem + catat SETTING_UPDATED di audit log (Khusus Manajer)'
+  /* #swagger.requestBody = {
+        required: true,
+        content: {
+          "application/json": {
+            schema: { $ref: "#/components/schemas/UpdateSettingsRequest" }
+          }
+        }
+     } */
   try {
     if (!req.v1User) {
       sendError(res, 401, 'Silakan login untuk melanjutkan.', [{ code: 'ERR-AUTH-01' }]);

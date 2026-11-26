@@ -53,6 +53,14 @@ export const submitReview = async (
 ): Promise<void> => {
   // #swagger.tags = ['Ulasan & Rating (E24-E25, E50)']
   // #swagger.summary = 'E25: Kirim rating (1-5) dan komentar ulasan untuk reservasi yang selesai'
+  /* #swagger.requestBody = {
+        required: true,
+        content: {
+          "application/json": {
+            schema: { $ref: "#/components/schemas/SubmitReviewRequest" }
+          }
+        }
+     } */
   try {
     if (!req.v1User) {
       sendError(res, 401, 'Silakan login untuk melanjutkan.', [{ code: 'ERR-AUTH-01' }]);

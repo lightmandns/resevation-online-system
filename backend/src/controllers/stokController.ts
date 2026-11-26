@@ -60,6 +60,14 @@ export const createIngredientReceipt = async (
 ): Promise<void> => {
   // #swagger.tags = ['Stok & Bahan Masuk']
   // #swagger.summary = 'E43: Catat bahan masuk baru / tambah stok + catat audit log'
+  /* #swagger.requestBody = {
+        required: true,
+        content: {
+          "application/json": {
+            schema: { $ref: "#/components/schemas/CreateIngredientReceiptRequest" }
+          }
+        }
+     } */
   try {
     const data = await stokService.recordStockIn(req.body ?? {}, getActor(req));
     sendSuccess(res, data, 'Bahan masuk berhasil dicatat.', 201);
@@ -94,6 +102,14 @@ export const updateInventoryStock = async (
 ): Promise<void> => {
   // #swagger.tags = ['Stok & Bahan Masuk']
   // #swagger.summary = 'E45: Perbarui jumlah stok gudang (>= 0) + catat audit log'
+  /* #swagger.requestBody = {
+        required: true,
+        content: {
+          "application/json": {
+            schema: { $ref: "#/components/schemas/UpdateStockQuantityRequest" }
+          }
+        }
+     } */
   try {
     const data = await stokService.updateStockQuantity(
       String(req.params.id),

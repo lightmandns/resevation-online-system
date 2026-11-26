@@ -64,6 +64,14 @@ export const listAdminBlocks = async (req: V1AuthRequest, res: Response): Promis
 export const createBlock = async (req: V1AuthRequest, res: Response): Promise<void> => {
   // #swagger.tags = ['Blok Meja']
   // #swagger.summary = 'E31: Tambah blok meja baru + catat audit log'
+  /* #swagger.requestBody = {
+        required: true,
+        content: {
+          "application/json": {
+            schema: { $ref: "#/components/schemas/CreateBlockRequest" }
+          }
+        }
+     } */
   try {
     const data = await blokMejaService.create(req.body ?? {}, getActor(req));
     sendSuccess(res, data, 'Blok meja berhasil ditambahkan.', 201);
@@ -75,6 +83,14 @@ export const createBlock = async (req: V1AuthRequest, res: Response): Promise<vo
 export const updateBlock = async (req: V1AuthRequest, res: Response): Promise<void> => {
   // #swagger.tags = ['Blok Meja']
   // #swagger.summary = 'E32: Ubah data blok meja / nominal DP / ketersediaan + catat audit log'
+  /* #swagger.requestBody = {
+        required: true,
+        content: {
+          "application/json": {
+            schema: { $ref: "#/components/schemas/UpdateBlockRequest" }
+          }
+        }
+     } */
   try {
     const data = await blokMejaService.update(
       String(req.params.id),

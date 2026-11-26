@@ -65,6 +65,14 @@ export const listAdminPromotions = async (req: V1AuthRequest, res: Response): Pr
 export const createPromotion = async (req: V1AuthRequest, res: Response): Promise<void> => {
   // #swagger.tags = ['Promosi']
   // #swagger.summary = 'E39: Tambah promosi/event baru + catat audit log'
+  /* #swagger.requestBody = {
+        required: true,
+        content: {
+          "application/json": {
+            schema: { $ref: "#/components/schemas/CreatePromotionRequest" }
+          }
+        }
+     } */
   try {
     const data = await promosiService.create(req.body ?? {}, getActor(req));
     sendSuccess(res, data, 'Promosi berhasil ditambahkan.', 201);
@@ -76,6 +84,14 @@ export const createPromotion = async (req: V1AuthRequest, res: Response): Promis
 export const updatePromotion = async (req: V1AuthRequest, res: Response): Promise<void> => {
   // #swagger.tags = ['Promosi']
   // #swagger.summary = 'E40: Ubah / nonaktifkan promosi/event + catat audit log'
+  /* #swagger.requestBody = {
+        required: true,
+        content: {
+          "application/json": {
+            schema: { $ref: "#/components/schemas/UpdatePromotionRequest" }
+          }
+        }
+     } */
   try {
     const data = await promosiService.update(String(req.params.id), req.body ?? {}, getActor(req));
     sendSuccess(res, data, 'Promosi berhasil diperbarui.');

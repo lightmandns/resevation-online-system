@@ -96,6 +96,14 @@ export const listAdminMenus = async (req: V1AuthRequest, res: Response): Promise
 export const createMenu = async (req: V1AuthRequest, res: Response): Promise<void> => {
   // #swagger.tags = ['Menu']
   // #swagger.summary = 'E35: Tambah menu baru + catat audit log'
+  /* #swagger.requestBody = {
+        required: true,
+        content: {
+          "application/json": {
+            schema: { $ref: "#/components/schemas/CreateMenuRequest" }
+          }
+        }
+     } */
   try {
     const data = await menuService.create(req.body ?? {}, getActor(req));
     sendSuccess(res, data, 'Menu berhasil ditambahkan.', 201);
@@ -107,6 +115,14 @@ export const createMenu = async (req: V1AuthRequest, res: Response): Promise<voi
 export const updateMenu = async (req: V1AuthRequest, res: Response): Promise<void> => {
   // #swagger.tags = ['Menu']
   // #swagger.summary = 'E36: Ubah data menu / harga / ketersediaan + catat audit log'
+  /* #swagger.requestBody = {
+        required: true,
+        content: {
+          "application/json": {
+            schema: { $ref: "#/components/schemas/UpdateMenuRequest" }
+          }
+        }
+     } */
   try {
     const data = await menuService.update(String(req.params.id), req.body ?? {}, getActor(req));
     sendSuccess(res, data, 'Data menu berhasil diperbarui.');
